@@ -160,35 +160,89 @@ export function createColumnHeaders(
 }
 
 /**
+ * @description Checks whether the value is null, empty or undefined
+ * @param {string|number} value The value to check
+ * @returns {boolean} True if the value is null, empty or undefined. False otherwise
+ */
+export function hasValue(value) {
+  return !(value === null || value === '' || typeof value === 'undefined');
+}
+
+/**
  * @description Reduces an array of values to a result
  * @param {!Array} arr The array to reduce
  * @param {?requestCallback|string} accCat Callback, category to reduce, or null
  * @param {string} accType Reduce type (count, average, min, max, etc) or initial value
+ * @param {string} nullHandlingType Type (ignore, force) of null handling
  * @param {*} accValue Initial value - string, number, array, or object
  * @returns {*} Reduced value
  * @todo Move accumulator to its own file since it will continue to grow
 */
-export function accumulator(arr, accCat, accType, accValue) {
+export function accumulator(arr, accCat, accType, nullHandlingType, accValue) {
   if (typeof accCat === 'undefined') accType = 'count';
   else if (typeof accCat === 'function') accValue = accType || 0;
+
+  const arrayLength = nullHandlingType === 'ignore' ?
+    arr.filter(val => val[accCat] !== null && val[accCat] !== '' &&
+      typeof val[accCat] !== 'undefined').length :
+    arr.length;
 
   return arr.reduce((acc, curr, index, array) => {
     if (typeof accCat === 'function') return accCat(acc, curr, index, array);
 
     switch (accType) {
       case ('average'): {
-        acc += Number(curr[accCat]) / arr.length;
+        if (!hasValue(curr[accCat])) {
+          switch (nullHandlingType) {
+            case 'ignore':
+              return acc;
+            case 'force':
+              acc = null;
+              break;
+            default:
+              break;
+          }
+        }
+        if (acc === null) return acc;
+
+        acc += Number(curr[accCat]) / arrayLength;
 
         return acc;
       }
 
       case ('count'): {
+        if (!hasValue(curr[accCat])) {
+          switch (nullHandlingType) {
+            case 'ignore':
+              return acc;
+            case 'force':
+              acc = null;
+              break;
+            default:
+              break;
+          }
+        }
+        if (acc === null) return acc;
+
         acc += 1;
 
         return acc;
       }
 
       case ('min'): {
+        if (!hasValue(curr[accCat])) {
+          switch (nullHandlingType) {
+            case 'ignore':
+              return acc;
+            case 'force':
+              acc = null;
+              break;
+            default:
+              break;
+          }
+        }
+        if (acc === null) return acc;
+
         if (index === 0) acc = Number(curr[accCat]);
         else if (curr[accCat] < acc) acc = Number(curr[accCat]);
 
@@ -196,6 +250,19 @@ export function accumulator(arr, accCat, accType, accValue) {
       }
 
       case ('max'): {
+        if (!hasValue(curr[accCat])) {
+          switch (nullHandlingType) {
+            case 'ignore':
+              return acc;
+            case 'force':
+              acc = null;
+              break;
+            default:
+              break;
+          }
+        }
+        if (acc === null) return acc;
+
         if (index === 0) acc = Number(curr[accCat]);
         else if (curr[accCat] > acc) acc = Number(curr[accCat]);
 
@@ -203,12 +270,38 @@ export function accumulator(arr, accCat, accType, accValue) {
       }
 
       case ('sum'): {
+        if (!hasValue(curr[accCat])) {
+          switch (nullHandlingType) {
+            case 'ignore':
+              return acc;
+            case 'force':
+              acc = null;
+              break;
+            default:
+              break;
+          }
+        }
+        if (acc === null) return acc;
+
         acc += Number(curr[accCat]);
 
         return acc;
       }
 
       default: {
+        if (!hasValue(curr[accCat])) {
+          switch (nullHandlingType) {
+            case 'ignore':
+              return acc;
+            case 'force':
+              acc = null;
+              break;
+            default:
+              break;
+          }
+        }
+        if (acc === null) return acc;
+
         acc += 1;
 
         return acc;
@@ -235,7 +328,7 @@ export function checkPivotCategories(actualCats, selectedCats) {
 }
 
 export function tableCreator(data, rows = [], cols = [], accCatOrCB,
-  accTypeOrInitVal, rowHeader, columnSortFunc) {
+  accTypeOrInitVal, rowHeader, columnSortFunc, nullHandlingType) {
 
   /** if data is empty, return empty array */
   if (data.length === 0) {
@@ -290,7 +383,8 @@ export function tableCreator(data, rows = [], cols = [], accCatOrCB,
             if (key === prevKey) {
               const datum = dataRows[dataRows.length - 1].value;
 
-              datum[map] = accumulator(dataPos, accCatOrCB, accTypeOrInitVal);
+              datum[map] = accumulator(dataPos, accCatOrCB,
+                accTypeOrInitVal, nullHandlingType);
               dataRows[dataRows.length - 1].value = datum;
 
               const rawDataDatum = rawData[rawData.length - 1].value;
@@ -301,7 +395,8 @@ export function tableCreator(data, rows = [], cols = [], accCatOrCB,
               prevKey = key;
               const datum = [key].concat(
                 Array(map - 1).fill(''),
-                accumulator(dataPos, accCatOrCB, accTypeOrInitVal),
+                accumulator(dataPos, accCatOrCB, accTypeOrInitVal,
+                  nullHandlingType),
                 Array(headerLength - (map + 1)).fill('')
               );
               const rawDataDatum = [key].concat(
@@ -377,7 +472,10 @@ export function tableCreator(data, rows = [], cols = [], accCatOrCB,
     }
   } else {
     dataRows.push({
-      value: [rowHeader, accumulator(data, accCatOrCB, accTypeOrInitVal)],
+      value: [
+        rowHeader,
+        accumulator(data, accCatOrCB, accTypeOrInitVal, nullHandlingType),
+      ],
       type: 'data',
       row: 1,
       depth: 0,
@@ -411,7 +509,8 @@ export function tableCreator(data, rows = [], cols = [], accCatOrCB,
 
     return filteredRows.map((accumulatedRawData) => {
       if (accumulatedRawData.length > 0) {
-        return accumulator(accumulatedRawData, accCatOrCB, accTypeOrInitVal);
+        return accumulator(accumulatedRawData, accCatOrCB, accTypeOrInitVal,
+          nullHandlingType);
       }
 
       return 'Totals';
@@ -440,7 +539,8 @@ export function tableCreator(data, rows = [], cols = [], accCatOrCB,
 
     return filteredRows.map((accumulatedRawData) => {
       if (accumulatedRawData.length > 0) {
-        return accumulator(accumulatedRawData, accCatOrCB, accTypeOrInitVal);
+        return accumulator(accumulatedRawData, accCatOrCB, accTypeOrInitVal,
+          nullHandlingType);
       }
 
       return '';

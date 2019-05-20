@@ -6,6 +6,7 @@ import createColumnHeadersTest from './logic/createColumnHeaders';
 import accumulatorTest from './logic/accumulator';
 import checkPivotCategoriesTest from './logic/checkPivotCategories';
 import tableCreatorTest from './logic/tableCreator';
+import hasValueTest from './logic/hasValue';
 
 describe('logic functions', () => {
   describe('fixDataFormat', fixDataFormatTest);
@@ -15,4 +16,5 @@ describe('logic functions', () => {
   describe('accumulator', accumulatorTest);
   describe('checkPivotCategories', checkPivotCategoriesTest);
   describe('tableCreator', tableCreatorTest);
+  describe('hasValue', hasValueTest);
 });

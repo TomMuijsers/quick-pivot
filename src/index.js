@@ -17,9 +17,19 @@ export default class Pivot {
    * @param {string} header Table header (displayed at hte top left)
    * @param {Function} custom sort function. will skip sort stage if equal to () => {}
    * @param {Function} columnSortFunc custom sort function for the columns
+   * @param {string} nullHandlingType Type (ignore, force) of null handling
    * @returns {Object} instantiated pivot object
   */
-  constructor(data, rows, cols, agg, type, header, sortFunc, columnSortFunc) {
+  constructor(data,
+    rows,
+    cols,
+    agg,
+    type,
+    header,
+    sortFunc,
+    columnSortFunc,
+    nullHandlingType
+  ) {
     if (!data) this.originalData = {};
     else {
       data = fixDataFormat(data, rows, sortFunc);
@@ -32,7 +42,8 @@ export default class Pivot {
         agg,
         type,
         header,
-        this.columnSortFunc
+        this.columnSortFunc,
+        nullHandlingType
       );
       this.uniqueValues = createUniqueValues(data);
     }
@@ -52,6 +63,7 @@ export default class Pivot {
    * @param {boolean} isFiltering If the method is being called by the filter method
    * @param {Function} custom sort function. will skip sort stage if equal to () => {}
    * @param {Function} columnSortFunc custom sort function for the columns
+   * @param {string} nullHandlingType Type (ignore, force) of null handling
    * @returns {Object} instantiated pivot object
   */
   update(
@@ -63,7 +75,8 @@ export default class Pivot {
     header,
     isFiltering,
     sortFunc,
-    columnSortFunc
+    columnSortFunc,
+    nullHandlingType
   ) {
     data = fixDataFormat(data, rows, sortFunc);
     /** if update isn't being used by filter, need to reset the original arguments */
@@ -80,7 +93,8 @@ export default class Pivot {
       agg,
       type,
       header,
-      this.columnSortFunc
+      this.columnSortFunc,
+      nullHandlingType
     );
     this.data = this.originalData;
     this.originalArgs.data = data;
