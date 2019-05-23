@@ -1,6 +1,6 @@
 {
-  "name": "quick-pivot",
-  "version": "2.7.0",
+  "name": "@energyessentials/quick-pivot",
+  "version": "2.7.1-1",
   "description": "a utility for quickly pivoting data",
   "main": "lib/quick-pivot.min.js",
   "scripts": {
@@ -17,7 +17,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/pat310/quick-pivot.git"
+    "url": "git+https://github.com/TomMuijsers/quick-pivot.git"
   },
   "keywords": [
     "pivot",
@@ -31,9 +31,9 @@
   "author": "Patrick Trasborg",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/pat310/quick-pivot/issues"
+    "url": "https://github.com/TomMuijsers/quick-pivot/issues"
   },
-  "homepage": "https://github.com/pat310/quick-pivot#readme",
+  "homepage": "https://github.com/TomMuijsers/quick-pivot#readme",
   "devDependencies": {
     "babel": "6.3.13",
     "babel-core": "6.1.18",

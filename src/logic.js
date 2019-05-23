@@ -175,10 +175,18 @@ export function hasValue(value) {
  * @param {string} accType Reduce type (count, average, min, max, etc) or initial value
  * @param {string} nullHandlingType Type (ignore, force) of null handling
  * @param {*} accValue Initial value - string, number, array, or object
+ * @param {?boolean} forTotals To indicate the accumulation of totals
  * @returns {*} Reduced value
  * @todo Move accumulator to its own file since it will continue to grow
 */
-export function accumulator(arr, accCat, accType, nullHandlingType, accValue) {
+export function accumulator(
+  arr,
+  accCat,
+  accType,
+  nullHandlingType,
+  accValue,
+  forTotals
+) {
   if (typeof accCat === 'undefined') accType = 'count';
   else if (typeof accCat === 'function') accValue = accType || 0;
 
@@ -190,12 +198,19 @@ export function accumulator(arr, accCat, accType, nullHandlingType, accValue) {
   return arr.reduce((acc, curr, index, array) => {
     if (typeof accCat === 'function') return accCat(acc, curr, index, array);
 
+    const currentValue = curr[accCat];
+
     switch (accType) {
       case ('average'): {
-        if (!hasValue(curr[accCat])) {
+        if (!hasValue(currentValue)) {
           switch (nullHandlingType) {
             case 'ignore':
-              return acc;
+              if (forTotals) {
+                return acc;
+              }
+
+              acc = null;
+              break;
             case 'force':
               acc = null;
               break;
@@ -205,16 +220,21 @@ export function accumulator(arr, accCat, accType, nullHandlingType, accValue) {
         }
         if (acc === null) return acc;
 
-        acc += Number(curr[accCat]) / arrayLength;
+        acc += Number(currentValue) / arrayLength; // TODO arrayLength can be 0
 
         return acc;
       }
 
       case ('count'): {
-        if (!hasValue(curr[accCat])) {
+        if (!hasValue(currentValue)) {
           switch (nullHandlingType) {
             case 'ignore':
-              return acc;
+              if (forTotals) {
+                return acc;
+              }
+
+              acc = null;
+              break;
             case 'force':
               acc = null;
               break;
@@ -230,10 +250,15 @@ export function accumulator(arr, accCat, accType, nullHandlingType, accValue) {
       }
 
       case ('min'): {
-        if (!hasValue(curr[accCat])) {
+        if (!hasValue(currentValue)) {
           switch (nullHandlingType) {
             case 'ignore':
-              return acc;
+              if (forTotals) {
+                return acc;
+              }
+
+              acc = null;
+              break;
             case 'force':
               acc = null;
               break;
@@ -243,17 +268,22 @@ export function accumulator(arr, accCat, accType, nullHandlingType, accValue) {
         }
         if (acc === null) return acc;
 
-        if (index === 0) acc = Number(curr[accCat]);
-        else if (curr[accCat] < acc) acc = Number(curr[accCat]);
+        if (index === 0) acc = Number(currentValue);
+        else if (currentValue < acc) acc = Number(currentValue);
 
         return acc;
       }
 
       case ('max'): {
-        if (!hasValue(curr[accCat])) {
+        if (!hasValue(currentValue)) {
           switch (nullHandlingType) {
             case 'ignore':
-              return acc;
+              if (forTotals) {
+                return acc;
+              }
+
+              acc = null;
+              break;
             case 'force':
               acc = null;
               break;
@@ -263,17 +293,22 @@ export function accumulator(arr, accCat, accType, nullHandlingType, accValue) {
         }
         if (acc === null) return acc;
 
-        if (index === 0) acc = Number(curr[accCat]);
-        else if (curr[accCat] > acc) acc = Number(curr[accCat]);
+        if (index === 0) acc = Number(currentValue);
+        else if (currentValue > acc) acc = Number(currentValue);
 
         return acc;
       }
 
       case ('sum'): {
-        if (!hasValue(curr[accCat])) {
+        if (!hasValue(currentValue)) {
           switch (nullHandlingType) {
             case 'ignore':
-              return acc;
+              if (forTotals) {
+                return acc;
+              }
+
+              acc = null;
+              break;
             case 'force':
               acc = null;
               break;
@@ -283,16 +318,21 @@ export function accumulator(arr, accCat, accType, nullHandlingType, accValue) {
         }
         if (acc === null) return acc;
 
-        acc += Number(curr[accCat]);
+        acc += Number(currentValue);
 
         return acc;
       }
 
       default: {
-        if (!hasValue(curr[accCat])) {
+        if (!hasValue(currentValue)) {
           switch (nullHandlingType) {
             case 'ignore':
-              return acc;
+              if (forTotals) {
+                return acc;
+              }
+
+              acc = null;
+              break;
             case 'force':
               acc = null;
               break;
@@ -474,7 +514,8 @@ export function tableCreator(data, rows = [], cols = [], accCatOrCB,
     dataRows.push({
       value: [
         rowHeader,
-        accumulator(data, accCatOrCB, accTypeOrInitVal, nullHandlingType),
+        accumulator(data, accCatOrCB, accTypeOrInitVal, nullHandlingType,
+          undefined, true),
       ],
       type: 'data',
       row: 1,
@@ -510,7 +551,7 @@ export function tableCreator(data, rows = [], cols = [], accCatOrCB,
     return filteredRows.map((accumulatedRawData) => {
       if (accumulatedRawData.length > 0) {
         return accumulator(accumulatedRawData, accCatOrCB, accTypeOrInitVal,
-          nullHandlingType);
+          nullHandlingType, undefined, true);
       }
 
       return 'Totals';
@@ -540,7 +581,7 @@ export function tableCreator(data, rows = [], cols = [], accCatOrCB,
     return filteredRows.map((accumulatedRawData) => {
       if (accumulatedRawData.length > 0) {
         return accumulator(accumulatedRawData, accCatOrCB, accTypeOrInitVal,
-          nullHandlingType);
+          nullHandlingType, undefined, true);
       }
 
       return '';

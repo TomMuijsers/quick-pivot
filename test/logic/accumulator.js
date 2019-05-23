@@ -59,32 +59,32 @@ export default () => {
 
   describe('accumulation category check with ignore nulls', () => {
     it('average', () => {
-      const accumulatedResults = accumulator(dataWithNulls, 'age', 'average', 'ignore');
+      const accumulatedResults = accumulator(dataWithNulls, 'age', 'average', 'ignore', undefined, true);
 
       expect(accumulatedResults).to.equal(29.25);
     });
     it('count', () => {
-      const accumulatedResults = accumulator(dataWithNulls, 'age', 'count', 'ignore');
+      const accumulatedResults = accumulator(dataWithNulls, 'age', 'count', 'ignore', undefined, true);
 
       expect(accumulatedResults).to.equal(4);
     });
     it('min', () => {
-      const accumulatedResults = accumulator(dataWithNulls, 'age', 'min', 'ignore');
+      const accumulatedResults = accumulator(dataWithNulls, 'age', 'min', 'ignore', undefined, true);
 
       expect(accumulatedResults).to.equal(28);
     });
     it('max', () => {
-      const accumulatedResults = accumulator(dataWithNulls, 'age', 'max', 'ignore');
+      const accumulatedResults = accumulator(dataWithNulls, 'age', 'max', 'ignore', undefined, true);
 
       expect(accumulatedResults).to.equal(30);
     });
     it('sum', () => {
-      const accumulatedResults = accumulator(dataWithNulls, 'age', 'sum', 'ignore');
+      const accumulatedResults = accumulator(dataWithNulls, 'age', 'sum', 'ignore', undefined, true);
 
       expect(accumulatedResults).to.equal(117);
     });
     it('default', () => {
-      const accumulatedResults = accumulator(dataWithNulls, 'age', 'default', 'ignore');
+      const accumulatedResults = accumulator(dataWithNulls, 'age', 'default', 'ignore', undefined, true);
 
       expect(accumulatedResults).to.equal(4);
     });
