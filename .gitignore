@@ -42,3 +42,4 @@ test.js
 
 # ignore intellij stuff
 .idea
+.vscode/

@@ -120,6 +120,18 @@ export default () => {
 
     expect(pivot.data.table).to.deep.equal(expected);
   });
+/*****************
+  ['name', 'gender', 'house', 'age'],
+  ['Jon', 'm', 'Stark', 14],
+  ['Arya', 'f', 'Stark', null],
+  ['Cersei', 'f', 'Baratheon', 38],
+  ['Tywin', 'm', 'Lannister', null],
+  ['Tyrion', 'm', 'Lannister', 34],
+  ['Joffrey', 'm', 'Baratheon', null],
+  ['Bran', 'm', 'Stark', 8],
+  ['Jaime', 'm', 'Lannister', 32],
+  ['Sansa', 'f', 'Stark', 12],
+*****************/
 
   it('should create a pivot with nulls ignored',
     () => {
@@ -129,17 +141,17 @@ export default () => {
         type: 'colHeader',
         row: 0,
       },
-      { value: [ 'f', 12, '', 38, '' ], depth: 0, type: 'rowHeader', row: 1 },
-      { value: [ 'Arya', null, '', '', 0 ], type: 'data', depth: 1, row: 2 },
-      { value: [ 'Cersei', '', '', 38, 38 ], type: 'data', depth: 1, row: 3 },
-      { value: [ 'Sansa', 12, '', '', 12 ], type: 'data', depth: 1, row: 4 },
-      { value: [ 'm', 22, 66, 0, '' ], depth: 0, type: 'rowHeader', row: 5 },
-      { value: [ 'Bran', 8, '', '', 8 ], type: 'data', depth: 1, row: 6 },
-      { value: [ 'Jaime', '', 32, '', 32 ], type: 'data', depth: 1, row: 7 },
-      { value: [ 'Joffrey', '', '', null, 0 ], type: 'data', depth: 1, row: 8 },
-      { value: [ 'Jon', 14, '', '', 14 ], type: 'data', depth: 1, row: 9 },
-      { value: [ 'Tyrion', '', 34, '', 34 ], type: 'data', depth: 1, row: 10 },
-      { value: [ 'Tywin', '', null, '', 0 ], type: 'data', depth: 1, row: 11 },
+      { value: [ 'f',       null,   '',   38,   '' ], depth: 0, type: 'rowHeader', row: 1 },
+      { value: [ 'Arya',    null, '',   '',   0 ], type: 'data', depth: 1, row: 2 },
+      { value: [ 'Cersei',  '',   '',   38,   38 ], type: 'data', depth: 1, row: 3 },
+      { value: [ 'Sansa',   12,   '',   '',   12 ], type: 'data', depth: 1, row: 4 },
+      { value: [ 'm',       22,   null, null,    '' ], depth: 0, type: 'rowHeader', row: 5 },
+      { value: [ 'Bran',    8,    '',   '',   8 ], type: 'data', depth: 1, row: 6 },
+      { value: [ 'Jaime',   '',   32,   '',   32 ], type: 'data', depth: 1, row: 7 },
+      { value: [ 'Joffrey', '',   '',   null, 0 ], type: 'data', depth: 1, row: 8 },
+      { value: [ 'Jon',     14,   '',   '',   14 ], type: 'data', depth: 1, row: 9 },
+      { value: [ 'Tyrion',  '',   34,   '',   34 ], type: 'data', depth: 1, row: 10 },
+      { value: [ 'Tywin',   '',   null, '',   0 ], type: 'data', depth: 1, row: 11 },
       { type: 'aggregated', value: ['Totals', 34, 66, 38, ''] },
     ];
 
